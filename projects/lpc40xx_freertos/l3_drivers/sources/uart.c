@@ -250,6 +250,7 @@ bool uart__polled_get(uart_e uart, char *input_byte) {
       while (!(uart_regs->LSR & char_available_bitmask)) {
       }
       *input_byte = uart_regs->RBR;
+      status = true;
     }
   }
 
