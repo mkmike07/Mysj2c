@@ -11,7 +11,17 @@ def cli_init():
     AddOption("--no-float-format", action="store_true", default=False)
     AddOption("--no-symbol-table", action="store_true", default=False)
     AddOption("--no-unit-test", action="store_true", default=False)
-    AddOption("--project", metavar="<project directory name>", default="lpc40xx_freertos", help="Specify a target project directory to build")
+    AddOption(
+        "--project",
+        metavar="<project directory name>",
+        default="lpc40xx_freertos",
+        help="Specify a target project directory to build",
+    )
+    AddOption(
+        "--native-toolchain",
+        action="store_true",
+        help="Use natively installed toolchains. Otherwise, auto detect and use one of the preinstalled toolchains",
+    )
     AddOption("--test-output", action="store_true", default=False)
     AddOption("--timeout", type=int, default=5, help="Unit test timeout in seconds")
     AddOption("--verbose", action="store_true", default=False)

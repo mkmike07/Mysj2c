@@ -1,119 +1,192 @@
 # SJ2-C Getting Started
 
-## Setup and Install
+This guide provides step-by-step instructions to set up your development environment to give you to ability to develop firmware, build firmware, flash firmware onto an attached board, and monitor an attached board over serial.
 
-Setup and install should be super simple unless you have Windows, which is not suited for ideal software development, but you can still use it. These steps should still get you setup regardless of your OS.
+## Target Outcome
 
-1. Install Python on Windows (Mac and Linux should already have that)
-    * Skip this for Mac or Linux
-    * Follow [this guide](installs/README.md) for Windows install guide
-2. Open up a terminal window or command prompt, and install `scons`:
-    * Type `pip install scons`
-    * If any issues on Ubuntu(Linux), try `sudo apt install scons`
-3. Install the Board driver from the `installs/drivers` directory
+Throughout this guide, we will:
 
-That is it, you should now be ready to build software for your board.
+1. Install software to set up your development environment
+2. Build the Docker image
+3. Build the firmware
+4. Flash the firmware
 
-### Additional dependencies for Mac and Linux
+By the end of this guide, you will have the following software installed on your computer:
 
-In order to run the unit-tests, `Ruby` and a `GCC compiler` is required for Mac and Linux. This is because the unit-tests compile an executable you run on your host machine, and it is not compiled for running on the embedded ARM target.
+* Docker
+* Python
+* Driver for USB-serial
+* Visual Studio Code (a.k.a. vscode)
+* Clang Format
 
-* For *Windows*, we have checked in Ruby and MinGW (Minimal GCC for Windows) already
-* In *Linux*, the GCC (development tools) should already be installed as part of default installation of Ubuntu
-* For *Mac*, you may have to install GCC equivalent which should be as easy as typing `xcode-select --install`
+Additionally by the end of this guide, you will be able to do the following:
 
-----
+* Modify source code
+* Build Docker images
+* Build firmware using a Docker container
+* Flash firmware over a USB to serial connection
+* Monitor firmware activity over a USB to serial connection
 
-## Compile & Flash
+# Step 1. Installation
 
-1. Use any IDE and open up the `lpc40xx_freertos` folder
-    * We recommend `Visual Studio Code`
-    * You can work on your code in an IDE and use command line to compile
-2. Build the project:
-    * **From the root directory** of this `sjtwo-c` folder, type: `scons`
-3. Invoke the python script to flash your new program
-    * From the root of `sjtwo-c` folder, type: `python nxp-programmer/flash.py` and it might just work :)
-    * The `flash.py` defaults to `lpc40xx_freertos.bin` file and auto detects your SJ2 serial port
-    * See [nxp-programmer README](nxp-programmer/README.md) and more examples in the following *Examples* section
-4. After flashing your new program, use your favorite serial terminal to watch the output from your board.
+## Install Docker
 
-### SCons 
-
-Full documentation of the `SCons` command [is listed at this README](README-SCons.md). This should be read so you fully understand how to build various different projects and run the unit-tests.
-
-### Typical Workflow
-
-This describes typical commands you will use to compile and flash the project:
+1. Follow this [Docker Engine Installation Guide](https://docs.docker.com/engine/install/).
+2. After installation, start Docker and leave it running in the background.
+3. Verify Docker is installed correctly:
 
 ```bash
-# 1. Edit your code and save it in Visual Studio Code
+# This command should work
+docker
 
-# 2. This will run unit tests and compile the `lpc40xx_freertos` project
-scons
-
-# 3. Finally, flash the project
-python nxp-programmer/flash.py
+# This should not produce a warning that the Docker daemon is not running.
+docker info
 ```
 
-### More advanced stuff
-```bash
-# Optionally, you can clean and compile the LPC project
+## Install Python
 
-# To clean compiled artifacts for the default project `lpc40xx_freertos`
-scons -c
+1. For Windows, follow this [Python Installation Guide](installs/README.md#python). Mac and Linux should already have it preinstalled.
 
-# You can compile the `lpc40xx_freertos` project without running unit-tests
-# Warning: If unit-tests fail, you will waste a lot of time debugging it on 
-# the controller, so do not skip them
-scons --no-unit-test
-
-# Compile with multiple threads (use as many threads as your machine has
-# Since I have 12, I will use -j12
-scons -j12
-```
-
-----
-
-## How `flash.py` works
-
-This script takes a COM port and your firmware file to program, however:
-*  COM port can be automatically detected if `--port` argument is not provided
-*  Firmware file is defaulted to `_build_lpc40xx_freertos/lpc40xx_freertos.bin` if `--input` argument is not provided
-
-Example:
-```bash
-python nxp-programmer/flash.py --port <Device Port> --input <.bin file path>`
-# <Device Port>    is your serial port
-# <.bin file path> is the path to your firmware you want to load to the board
-
-# The script can auto-detects your `--port`, so you should be able to flash using:
-python nxp-programmer/flash.py --input _build_lpc40xx_freertos/lpc40xx_freertos.bin`
-```
-
-### More `flash.py` Examples
-
-Providing an explicit `--port` may be faster to program, but initially you would need to know what `--port` your SJ board is at. Try using `python nxp-programmer/flash.py` which will use the default binary file, and automatically find the port for you, otherwise follow the examples below:
+2. Verify Python is installed correctly:
 
 ```bash
-# All these examples will default to use "_build_lpc40xx_freertos/lpc40xx_freertos.bin"
+# Ensure this command works on Windows
+python --version
 
-# Example on Windows:
-python nxp-programmer/flash.py --port COM6
-
-# Example on Linux:
-python nxp-programmer/flash.py --port /dev/ttyUSB
-
-# Example on Mac:
-python nxp-programmer/flash.py --port /dev/tty.SLAB_USBtoUART
-
-# ##################################
-# Fully explicit command on windows:
-python nxp-programmer/flash.py --port COM6 --input _build_lpc40xx_freertos/lpc40xx_freertos.bin
+# Alternatively, this is fine too for Linux and Mac
+python3 --version
 ```
 
-### Advanced Tips
+## Install USB-Serial Driver
 
-* You can use `-i` (single dash) in place of `--input`
-* You can use `-p` (single dash) in place of `--port`
-* If `-i` is not provided, then the tool will default to `_build_lpc40xx_freertos/lpc40xx_freertos.bin`
-* So, you could use: `python nxp-programmer/flash.py --device /dev/ttyUSB`
+1. Install the driver:
+    * For Mac, install `installs/drivers/mac/SiLabsUSBDriverDisk.dmg`.
+    * For Windows, extract `installs/drivers/windows/CP210x_Windows_Drivers.zip` then run `CP210xVCPInstaller_x64.exe`.
+    * For Linux, the driver comes bundled in the kernel, so you don't need to install it separately.
+
+## Install Visual Studio Code
+
+This step is highly recommended; install Visual Studio Code (i.e. VSCode) IDE for code editing.
+
+1. Download and install [Visual Studio Code](https://code.visualstudio.com/download).
+
+### (Optional) Install VSCode Extensions
+
+2. Install Visual Code extensions:
+    * [C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
+    * [Clang-Format](https://marketplace.visualstudio.com/items?itemName=xaver.clang-format)
+
+#### Install Clang Format
+
+1. For Windows, follow this [Clang Format Dependency Installation Guide](installs/README.md#clang-format-windows-only).
+2. Install Clang Format:
+
+```bash
+# Alternatively, use 'python3'
+python -m pip install clang-format
+```
+
+3. Verify Clang Format is installed correctly:
+
+```bash
+# This should produce a version message
+clang-format --version
+```
+
+# Step 2. Setup
+
+## Build Docker Image
+
+1. Build the development Docker image:
+
+```bash
+python ./run setup
+```
+
+# Step 3. Build and Flash
+
+At this point, the set up is complete. The steps below describe your typical daily workflow.
+
+1. Build the development Docker image:
+
+```bash
+python ./run build
+```
+
+2. Ensure your target device is attached via USB-serial connection.
+
+3. Flash the compiled firmware `.bin` file:
+
+```bash
+python ./run flash
+```
+
+# Step 4. Familiarize Yourself With the `run` Script
+
+At this point you should be ready for development. This step is optional. In this step, learn more about the `run` script, a multi-purpose tool for development with the ability to build, flash, etc.
+
+Here are some other ways to use the `run` script:
+
+```bash
+# Linux or Mac
+./run
+
+# Windows
+python run
+```
+
+The `run` script takes a subcommand to perform specific operations. See the `run` help message for more information:
+
+```bash
+# `run` usage format
+./run {subcommand} {arguments} -- {passthrough arguments}
+
+# To list available subcommands, see its help message
+./run -h
+```
+
+Here are some other use cases:
+
+```bash
+# Build using only a single CPU core
+./run build -- -j1
+
+# Build with verbose information
+./run build -- --verbose
+
+# Clean (delete) your last build
+./run build -- -c
+
+# Skip unit tests
+./run build -- --no-unit-test
+
+# See other available build options
+./run build -- -h
+
+# Flash using a specific port
+./run flash -- --port COM1
+
+# See other available flash options
+./run flash -- -h
+```
+
+## Other Workflows
+
+Here are some other use cases beyond building and flashing firmware.
+
+**Developing Executables**
+
+```bash
+# Build a native executable
+./run build -- --project=x86_freertos
+
+# Run an executable in the Docker container
+./run exe -- _build_x86_freertos/x86_freertos.exe
+```
+
+**Docker Maintenance and Experimentation**
+
+```bash
+# Open a shell session in the Docker container
+./run shell
+```

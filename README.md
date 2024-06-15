@@ -17,21 +17,17 @@ Infrastructure highlights:
 - No VMs
 - No WSL dependency on Windows
 
-----
 
 ## Next Steps
 
-- [Build and Flash Project](README-GETTING-STARTED.md) 
-- [Read more about SCons](README-SCons.md) to figure out how to build projects
+- Set up your development environment, then build and flash firmware by following this [Getting Started Guide](README-GETTING-STARTED.md).
 
 ## Videos
 
-We have made some videos that you may find useful
+We have made some videos that you may find useful:
 
 - [Comprehensive Development Environment](https://www.youtube.com/watch?v=EbiCummaIM0)
 - [Compile ARM project](https://www.youtube.com/watch?v=--AL0VKzvU8)
-
-----
 
 ## Build System
 
@@ -45,7 +41,9 @@ SCons discusses the advantages and disadvantages of other existing build systems
 
 From experience, we can state that `bazel` is really cool, but hard to extend and problematic in Windows. SCons dependencies are tricky, but it is based on python and easy to understand and extend. SCons takes advantage of a Python interpreter making it portable across multiple platforms (Mac, Linux, Windows).
 
-----
+## Docker
+
+This project utilizes Docker for its development environment. For educational purposes, feel free to see the [Docker Guide](README-DOCKER.md) to learn how to maintain and manually interact with this project's Docker image. However, it's important to note that this guide is not part of the firmware development workflow and is only applicable to maintainers of this project.
 
 ## History
 
@@ -54,5 +52,3 @@ We wanted to build a strong foundational sample project for SJ-2 development boa
 Originally, Preet created "SJ1" development board, which meant that there was one development board across multiple classes at SJSU. I was an enthusiast and created a hybrid project composed of C and C++ sources. I love C++ a little more than C because I can express artistic designs in the language, but a language is really a tool, and you need to select the right tool for the job. Presently I work on Embedded *Firmware* code for automotive industry which is in C, and *Software* code in C++, because C is the right tool for firmware, and C++ is the right tool for software. "SJ2" [original](https://github.com/kammce/SJSU-Dev2) software was also designed by an enthusiast (Khalil), who is a very talented person, but expressing a starter project in C++ increased the complexity so much that many developers had a difficult time adopting it.
 
 This is where the *SJ2-C* was born, which was completely re-designed to write simple code that everyone could understand. Many students are new to programming and it was not expected that C++ would come naturally. The code may appear less fancy, but it is simple to understand and traceable with minimal abstractions. The goal is to avoid designing yet another Arduino platform. There is no such thing as magic in the field of firmware engineering.
-
-----

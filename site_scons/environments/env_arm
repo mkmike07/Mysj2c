@@ -37,6 +37,7 @@ env_arm = Environment(
     LINKFLAGS=[
         "-nostartfiles",
         "-specs=nano.specs",
+        "-specs=nosys.specs",
         "-Wl,--gc-sections",
         # This provides non operational stubs for _write(), _sbrk() etc.
         # "-specs=nosys.specs",
@@ -45,7 +46,7 @@ env_arm = Environment(
     CPPDEFINES=[],
     LIBS=[
         "m",
-    ]
+    ],
 )
 
 """ Define additional flags """
@@ -69,16 +70,20 @@ COMMON_FLAGS = [
     "-Wnull-dereference",
     "-Wno-format-nonliteral",
     # Warnings - These cause a lot of warnings but should ideally be solved in code
-    #"-Wextra",
-    #"-Wconversion",
+    # "-Wextra",
+    # "-Wconversion",
 ]
 
 """ Define conditional flags """
 if not no_float_format:
-    env_arm["LINKFLAGS"].extend([
-        "-u", "_printf_float",
-        "-u", "_scanf_float",
-    ])
+    env_arm["LINKFLAGS"].extend(
+        [
+            "-u",
+            "_printf_float",
+            "-u",
+            "_scanf_float",
+        ]
+    )
 
 env_arm["CFLAGS"].extend(COMMON_FLAGS)
 env_arm["LINKFLAGS"].extend(COMMON_FLAGS)
@@ -92,6 +97,8 @@ References:
 - https://sourceware.org/binutils/docs/binutils/objdump.html
 - https://sourceware.org/binutils/docs/binutils/size.html
 """
+
+
 def objcopy_generator(source, target, env, for_signature):
     """
     :raise: KeyError if target format is not supported.
@@ -119,17 +126,29 @@ def toolchain_description_generator(source, target, env, for_signature):
 
 
 env_arm["BUILDERS"]["Objcopy"] = Builder(generator=objcopy_generator)
-env_arm["BUILDERS"]["Objdump"] = Builder(action="$OBJDUMP --source --all-headers --demangle --line-numbers --wide $SOURCE > $TARGET")
+env_arm["BUILDERS"]["Objdump"] = Builder(
+    action="$OBJDUMP --source --all-headers --demangle --line-numbers --wide $SOURCE > $TARGET"
+)
 env_arm["BUILDERS"]["Size"] = Builder(action="$SIZE --format=berkeley $SOURCE")
 
-env_arm["BUILDERS"]["PrintToolchainDescription"] = Builder(generator=toolchain_description_generator)
+env_arm["BUILDERS"]["PrintToolchainDescription"] = Builder(
+    generator=toolchain_description_generator
+)
 
-if osops.is_windows():
-    osops.prepend_env_var(env_arm, Dir("#/toolchains/windows/gcc-arm-none-eabi-8-2019-q3-update/bin"))
+if GetOption("native_toolchain"):
+    pass
+elif osops.is_windows():
+    osops.prepend_env_var(
+        env_arm, Dir("#/toolchains/windows/gcc-arm-none-eabi-8-2019-q3-update/bin")
+    )
 elif osops.is_linux():
-    osops.prepend_env_var(env_arm, Dir("#/toolchains/linux/gcc-arm-none-eabi-8-2019-q3-update/bin"))
+    osops.prepend_env_var(
+        env_arm, Dir("#/toolchains/linux/gcc-arm-none-eabi-8-2019-q3-update/bin")
+    )
 elif osops.is_macos():
-    osops.prepend_env_var(env_arm, Dir("#/toolchains/mac/gcc-arm-none-eabi-8-2019-q3-update/bin"))
+    osops.prepend_env_var(
+        env_arm, Dir("#/toolchains/mac/gcc-arm-none-eabi-8-2019-q3-update/bin")
+    )
 else:
     print("[{}] is an unsupported OS!".format(sys.platform))
     sys.exit(-1)
