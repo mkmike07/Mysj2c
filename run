@@ -238,7 +238,12 @@ def run_docker_container(
         docker_command = [docker_command]
     docker_command = docker_command or []
 
-    command = "docker run --rm -it {mount_arg} --name={docker_image_name} {docker_image_name} {docker_command}".format(
+    # Prefix the docker command; ensure all newly created files/directories are readable and writable by others
+    # to allow all users to access them freely
+    if docker_command:
+        docker_command[0] = f"umask 000;{docker_command[0]}"
+
+    command = 'docker run --rm -it --entrypoint /bin/bash {mount_arg} --name={docker_image_name} {docker_image_name} -c "{docker_command}"'.format(
         docker_image_name=docker_image_name,
         docker_command=" ".join(docker_command),
         mount_arg="--mount src=.,target=/root/sjtwo-c,type=bind",
