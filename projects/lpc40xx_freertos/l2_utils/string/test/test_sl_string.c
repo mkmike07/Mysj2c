@@ -421,7 +421,7 @@ void test__printf_fails_with_null_string_pointer(void) {
 }
 
 void test__printf_fails_with_null_format_pointer(void) {
-  const int printed_count = sl_string__printf(str, NULL, "Hello", 123, "World");
+  const int printed_count = sl_string__printf(str, NULL);
   TEST_ASSERT_EQUAL_INT(0, printed_count);
 }
 
@@ -492,7 +492,7 @@ void test__printf_append_fails_with_null_string_pointer(void) {
 
 void test__printf_append_fails_with_null_format_pointer(void) {
   str = sl_string__initialize(string_memory, sizeof(string_memory) - string_memory_pad_size);
-  const int printed_count = sl_string__printf_append(str, NULL, "");
+  const int printed_count = sl_string__printf_append(str, NULL);
   TEST_ASSERT_EQUAL_INT(0, printed_count);
 }
 
@@ -533,9 +533,8 @@ void test__scanf_fails_with_null_string_pointer(void) {
 }
 
 void test__scanf_fails_with_null_format_pointer(void) {
-  char *hello_str = "";
   str = sl_string__initialize(string_memory, sizeof(string_memory) - string_memory_pad_size);
-  int parsed_count = sl_string__scanf(str, NULL, hello_str);
+  int parsed_count = sl_string__scanf(str, NULL);
   TEST_ASSERT_EQUAL_INT(0, parsed_count);
 }
 
