@@ -11,9 +11,15 @@ from nxpprog import NXPPROG_PY
 
 SELF_DIRPATH = os.path.dirname(__file__)
 REPO_ROOT_DIRPATH = os.path.join(SELF_DIRPATH, "..")
-DEFAULT_BIN_FILEPATH = os.path.join(
-    REPO_ROOT_DIRPATH, "_build_lpc40xx_freertos", "lpc40xx_freertos.bin"
-)
+
+#DEFAULT_BIN_FILEPATH = os.path.join(REPO_ROOT_DIRPATH, "_build_lpc40xx_freertos", "lpc40xx_freertos.bin")
+
+DEFAULT_BIN_FILEPATH = os.path.join(REPO_ROOT_DIRPATH, "_build_lpc40xx_cmpe30", "lpc40xx_cmpe30.bin")
+
+
+#DEFAULT_BIN_FILEPATH = os.path.join(REPO_ROOT_DIRPATH, "_build_GPIO", "GPIO.bin")
+
+
 
 FAILURE = r"""
 _____ _    ___ _    _   _ ____  _____
@@ -101,7 +107,11 @@ def main():
     sys.stdout.flush()
 
     cmd = [
+<<<<<<< HEAD
         get_python_exe(),
+=======
+        "python3",
+>>>>>>> This is my first commit
         NXPPROG_PY,
         "--binary={}".format(input_filepath),
         "--device={}".format(device_id),

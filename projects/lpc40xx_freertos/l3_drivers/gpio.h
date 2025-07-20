@@ -17,6 +17,7 @@ typedef enum {
  * Each pin on LPC40xx has up to 8 functions
  * The functions are specific to a pin and vary; only function 0 is common, which is a GPIO
  */
+
 typedef enum {
   GPIO__FUNCITON_0_IO_PIN = 0,
   GPIO__FUNCTION_1,

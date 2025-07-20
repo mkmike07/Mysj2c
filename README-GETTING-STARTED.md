@@ -89,26 +89,16 @@ python -m pip install clang-format
 3. Verify Clang Format is installed correctly:
 
 ```bash
-# This should produce a version message
-clang-format --version
+# 1. Edit your code and save it in Visual Studio Code
+
+# 2. This will run unit tests and compile the `lpc40xx_freertos` project
+scons
+
+# 3. Finally, flash the project
+python nxp-programmer/flash.py
 ```
 
-# Step 2. Setup
-
-## Build Docker Image
-
-1. Build the development Docker image:
-
-```bash
-python ./run setup
-```
-
-# Step 3. Build and Flash
-
-At this point, the set up is complete. The steps below describe your typical daily workflow.
-
-1. Build the development Docker image:
-
+### More advanced stuff
 ```bash
 python ./run build
 ```
@@ -128,65 +118,38 @@ At this point you should be ready for development. This step is optional. In thi
 Here are some other ways to use the `run` script:
 
 ```bash
-# Linux or Mac
-./run
+python nxp-programmer/flash.py --port <Device Port> --input <.bin file path>`
+# <Device Port>    is your serial port
+# <.bin file path> is the path to your firmware you want to load to the board
 
-# Windows
-python run
+# The script can auto-detects your `--port`, so you should be able to flash using:
+python nxp-programmer/flash.py --input _build_lpc40xx_freertos/lpc40xx_freertos.bin`
 ```
 
-The `run` script takes a subcommand to perform specific operations. See the `run` help message for more information:
+### More `flash.py` Examples
+
+Providing an explicit `--port` may be faster to program, but initially you would need to know what `--port` your SJ board is at. Try using `python nxp-programmer/flash.py` which will use the default binary file, and automatically find the port for you, otherwise follow the examples below:
 
 ```bash
-# `run` usage format
-./run {subcommand} {arguments} -- {passthrough arguments}
+# All these examples will default to use "_build_lpc40xx_freertos/lpc40xx_freertos.bin"
 
-# To list available subcommands, see its help message
-./run -h
+# Example on Windows:
+python nxp-programmer/flash.py --port COM6
+
+# Example on Linux:
+python nxp-programmer/flash.py --port /dev/ttyUSB
+
+# Example on Mac:
+python nxp-programmer/flash.py --port /dev/tty.SLAB_USBtoUART
+
+# ##################################
+# Fully explicit command on windows:
+python nxp-programmer/flash.py --port COM6 --input _build_lpc40xx_freertos/lpc40xx_freertos.bin
 ```
 
-Here are some other use cases:
+### Advanced Tips
 
-```bash
-# Build using only a single CPU core
-./run build -- -j1
-
-# Build with verbose information
-./run build -- --verbose
-
-# Clean (delete) your last build
-./run build -- -c
-
-# Skip unit tests
-./run build -- --no-unit-test
-
-# See other available build options
-./run build -- -h
-
-# Flash using a specific port
-./run flash -- --port COM1
-
-# See other available flash options
-./run flash -- -h
-```
-
-## Other Workflows
-
-Here are some other use cases beyond building and flashing firmware.
-
-**Developing Executables**
-
-```bash
-# Build a native executable
-./run build -- --project=x86_freertos
-
-# Run an executable in the Docker container
-./run exe -- _build_x86_freertos/x86_freertos.exe
-```
-
-**Docker Maintenance and Experimentation**
-
-```bash
-# Open a shell session in the Docker container
-./run shell
-```
+* You can use `-i` (single dash) in place of `--input`
+* You can use `-p` (single dash) in place of `--port`
+* If `-i` is not provided, then the tool will default to `_build_lpc40xx_freertos/lpc40xx_freertos.bin`
+* So, you could use: `python nxp-programmer/flash.py --device /dev/ttyUSB`

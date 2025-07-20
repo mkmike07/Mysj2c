@@ -22,7 +22,7 @@ static volatile uint32_t *gpio__get_iocon(gpio_s gpio) {
 
 /*******************************************************************************
  *
- *                      P U B L I C    F U N C T I O N S
+ *                      P U B L I C    F U N C T I O N Sd
  *
  ******************************************************************************/
 
@@ -47,12 +47,6 @@ gpio_s gpio__construct_as_output(gpio__port_e port, uint8_t pin_number_0_to_31) 
   return gpio;
 }
 
-gpio_s gpio__construct_with_function(gpio__port_e port, uint8_t pin_number_0_to_31, gpio__function_e function) {
-  gpio_s gpio = gpio__construct(port, pin_number_0_to_31);
-  gpio__set_function(gpio, function);
-  return gpio;
-}
-
 void gpio__set_function(gpio_s gpio, gpio__function_e function) {
   volatile uint32_t *pin_iocon = gpio__get_iocon(gpio);
 
@@ -60,6 +54,12 @@ void gpio__set_function(gpio_s gpio, gpio__function_e function) {
   const uint32_t config_mask = UINT32_C(7);
   *pin_iocon &= ~(config_mask << 0);
   *pin_iocon |= ((uint32_t)function & config_mask);
+}
+
+gpio_s gpio__construct_with_function(gpio__port_e port, uint8_t pin_number_0_to_31, gpio__function_e function) {
+  gpio_s gpio = gpio__construct(port, pin_number_0_to_31);
+  gpio__set_function(gpio, function);
+  return gpio;
 }
 
 void gpio__enable_open_drain(gpio_s gpio) {
